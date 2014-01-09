@@ -49,16 +49,15 @@ var ServiceKeys = [
 ];
 
 var CommandConstants = new function() {
-	this.COMMAND_START_NGINX = "gksu service nginx start";
-	this.COMMAND_STOP_NGINX = "gksu service nginx stop";
-	this.COMMAND_START_MYSQL = "gksu service mysql start";
-	this.COMMAND_STOP_MYSQL = "gksu service mysql stop";
-	this.COMMAND_START_PGSQL = "gksu service postgresql start";
-	this.COMMAND_STOP_PGSQL = "gksu service postgresql stop";
-	this.COMMAND_STATUS_NGINX = "service nginx status";
-	this.COMMAND_NGINX_CONFIG_EDIT = "gksu gedit /etc/nginx/sites-available/default";
+	this.COMMAND_START_XAMPP = "gksu /opt/lampp/lampp start";
+	this.COMMAND_STOP_XAMPP = "gksu /opt/lampp/lampp stop";
+	this.COMMAND_START_MYSQL = "gksu /opt/lampp/lampp startmysql";
+	this.COMMAND_STOP_MYSQL = "gksu /opt/lampp/lampp stopmysql";
+	this.COMMAND_XAMMP_RESTART = "gksu /opt/lampp/lampp restart";
+	this.COMMAND_XAMPP_CONFIG_EDIT = "gksu gedit /opt/lampp/etc/httpd.conf";
 	this.COMMAND_LAUNCH_WEBDIR = "xdg-open http://127.0.0.1/";
-	this.COMMAND_OPEN_WEBDIR = "xdg-open /home/wolfman/Projects";
+	this.COMMAND_OPEN_WEBDIR = "xdg-open /home/hany/public_html";
+	this.COMMAND_LAUNCH_PHPMYADMIN = "xdg-open http://127.0.0.1/phpmyadmin";
 }
 
 function ErrorCommandDialog(){
@@ -147,17 +146,25 @@ devUtils.prototype = {
 			//Begin Switch Buttons
 			if((this.services.actor == true || this.services == true) && this.services_type == "buttons") {
 				
-				for (var i in ServiceKeys) {
-					this[ServiceKeys[i][0] + "EnabledSwitch"] = new PopupMenu.PopupSwitchMenuItem(_(ServiceKeys[i][1]), checkService(ServiceKeys[i][2]));
-					this.menu.addMenuItem(this[ServiceKeys[i][0] + "EnabledSwitch"]);
-					
-				}
-				this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+				this.menu.addAction(_("Start XAMMP ALL Service"), function(event) {
+					Util.spawnCommandLine(CommandConstants.COMMAND_START_XAMPP);
+				});
+
+				this.menu.addAction(_("Stop XAMMP ALL Service"), function(event) {
+					Util.spawnCommandLine(CommandConstants.COMMAND_STOP_XAMPP);
+				});
+
+				this.menu.addAction(_("Restart XAMMP Services"), function(event) {
+					Util.spawnCommandLine(CommandConstants.COMMAND_XAMMP_RESTART);
+				});
+
 			}
 			//End Switch Buttons
 													
             this._contentSection = new PopupMenu.PopupMenuSection();
-            this.menu.addMenuItem(this._contentSection);                    
+            this.menu.addMenuItem(this._contentSection);   
+
+	    this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());                 
             
             //Begin Subemnu Control Items
             if((this.services.actor == true || this.services == true) && this.services_type == "submenu") {
@@ -200,7 +207,7 @@ devUtils.prototype = {
             
             //BEGIN STATIC MENU
             if(this.config.actor == true || this.config == true) {
-				var open_dir = this.open_project_dir;
+				var open_dir = CommandConstants.COMMAND_OPEN_WEBDIR;
 				this.menu.addAction(_("Open Project Directory"), function(event) {
 					try {
 						Util.trySpawnCommandLine(open_dir);
@@ -215,8 +222,12 @@ devUtils.prototype = {
 					Util.spawnCommandLine(CommandConstants.COMMAND_LAUNCH_WEBDIR);
 				});
 
-				this.menu.addAction(_("Edit default nginx config"), function(event) {
-					Util.spawnCommandLine(CommandConstants.COMMAND_NGINX_CONFIG_EDIT);
+				this.menu.addAction(_("Launch phpMyAdmin"), function(event) {
+					Util.spawnCommandLine(CommandConstants.COMMAND_LAUNCH_PHPMYADMIN);
+				});
+
+				this.menu.addAction(_("Edit XAMPP Apache config"), function(event) {
+					Util.spawnCommandLine(CommandConstants.COMMAND_XAMPP_CONFIG_EDIT);
 				});
 				//this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 			}
